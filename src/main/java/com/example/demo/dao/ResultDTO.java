@@ -1,5 +1,8 @@
 package com.example.demo.dao;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
 public class ResultDTO {
 
     private String colFromTable1;

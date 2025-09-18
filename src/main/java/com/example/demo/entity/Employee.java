@@ -1,11 +1,30 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name="view_combined")
 public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private int id;
+
+    @Column
     private String name;
+
+    @Column
     private int age;
+    @Column
+
     private double salary;
+
+    @Column
     private String department;
+
+    public Employee() {
+    }
 
     public Employee(int id, String name, int age, double salary, String department) {
         this.id = id;
@@ -57,7 +76,7 @@ public class Employee {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", age=" + age +
-                ", salary=" + salary +
+                ", salary=$" + String.format("%,.2f", salary) +
                 ", department='" + department + '\'' +
                 '}';
     }

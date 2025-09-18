@@ -2,6 +2,8 @@ package com.example.demo;
 
 import com.example.demo.dao.AppDAO;
 import com.example.demo.entity.*;
+import com.example.demo.service.EmployeeService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,10 +18,21 @@ public class DemoApplication {
 		SpringApplication.run(DemoApplication.class, args);
 	}
 
+	@Autowired
+	EmployeeService employeeService;
+
 	@Bean
 	public CommandLineRunner commandLineRunner(AppDAO appDAO) {
+
 		return runner -> {
-			List<Employee> empList = getEmployeeList();
+			//new version
+			List<Employee> empList = employeeService.getAllEmployees();
+			System.out.println("\nemployeeService.getAllEmployees()");
+			printEmployees(empList);
+
+			// old version
+			// System.out.println(appDAO.getOneRow(2));
+
 			System.out.println("\nThe employees list:");
 			printEmployees(empList);
 
@@ -35,13 +48,13 @@ public class DemoApplication {
 			System.out.println("\n\ngetEmployeesPerDept(empList):");
 			getEmployeesPerDept(empList);
 
-			System.out.println("\ngetHighestSalaryEmployee(empList): $" + String.format("%.2f", getHighestSalaryEmployee(empList)));
+			System.out.println("\ngetHighestSalaryEmployee(empList): $" + String.format("%,.2f", getHighestSalaryEmployee(empList)));
 
 			System.out.println("\ncheckPalimdromeIds(empList):");
 			checkPalimdromeIds(empList);
 
 			System.out.println("\nshifyRightEmployees(empList, 3):");
-			printEmployees(shifyRightEmployees(empList, 3));
+			printEmployees(shiftRightEmployees(empList, 3));
 
 			System.out.println("\nVehicle data:");
 			Vehicle[] vehicles = {
@@ -59,11 +72,11 @@ public class DemoApplication {
 			vehicle.start();
 			vehicle.stop();
 			vehicle.getDetails();
-			System.out.println("Cost: " + String.format("%.2f", vehicle.calculateServiceCost()));
+			System.out.println("Cost: " + String.format("%,.2f", vehicle.calculateServiceCost()));
 		}
 	}
 
-	private List<Employee> shifyRightEmployees(List<Employee> empList, int k) {
+	private List<Employee> shiftRightEmployees(List<Employee> empList, int k) {
 		for (int i = 0; i < k; i++) {
 			empList.addFirst(empList.removeLast());
 		}
@@ -115,18 +128,38 @@ public class DemoApplication {
 	}
 
 	private void getDuplicateEmpNames(List<Employee> empList) {
-		Map<String, Integer> namesMap = new HashMap<>();
-		for (Employee emp: empList) {
-			String name = emp.getName();
-			namesMap.put(name, namesMap.containsKey(name) ? namesMap.get(name)+1 : 1);
-		}
+		Set<String> uniqueNames = new HashSet<>();
+		Set<String> duplicateNames = new HashSet<>();
 
 		System.out.print("Duplicate names: ");
-		for (Map.Entry<String, Integer> entry : namesMap.entrySet()) {
-			if (entry.getValue() > 1) {
-				System.out.print(" " + entry.getKey());
+//		for (Employee emp: empList) {
+//			if (!uniqueNames.add(emp.getName())) {
+//				System.out.print(emp.getName() + " ");
+//			}
+//		}
+
+		for (Employee emp: empList) {
+			if (!uniqueNames.add(emp.getName())) {
+				duplicateNames.add(emp.getName());
 			}
 		}
+		for (String name: duplicateNames) {
+			System.out.print(" " +name);
+		}
+
+
+//		Map<String, Integer> namesMap = new HashMap<>();
+
+//		for (Employee emp: empList) {
+//			String name = emp.getName();
+//			namesMap.put(name, namesMap.containsKey(name) ? namesMap.get(name)+1 : 1);
+//		}
+//
+//		for (Map.Entry<String, Integer> entry : namesMap.entrySet()) {
+//			if (entry.getValue() > 1) {
+//				System.out.print(" " + entry.getKey());
+//			}
+//		}
 	}
 
 	public void printEmployees(List<Employee> empList) {
@@ -157,19 +190,19 @@ public class DemoApplication {
 		}
 
 		for (Map.Entry<String, Employee> entry : highestPaidByDept.entrySet()) {
-			System.out.println("Department: " + entry.getKey() + ", Employee: " + entry.getValue().getName() + ", Salary: " + entry.getValue().getSalary());
+			System.out.println("Department: " + entry.getKey() + ", Employee: " + entry.getValue().getName() + ", Salary: $" + String.format("%,.2f", entry.getValue().getSalary()));
 		}
 	}
 
 	public List<Employee> getEmployeeList() {
 		List<Employee> employeeList = new ArrayList<>();
-		employeeList.add(new Employee(100, "Alice", 66, 90000.90, "Engineering"));
-		employeeList.add(new Employee(101, "Jim", 40, 120000, "Engineering"));
+		employeeList.add(new Employee(100, "Charlie", 66, 9000.90, "Engineering"));
+		employeeList.add(new Employee(101, "Jim", 40, 990000, "Engineering"));
 		employeeList.add(new Employee(102, "Charlie", 78, 70000, "Marketing"));
-		employeeList.add(new Employee(103, "John", 25, 99999.99, "Marketing"));
+		employeeList.add(new Employee(103, "John111", 25, 99999.99, "Marketing"));
 		employeeList.add(new Employee(1000, "Jim", 55, 68500.20, "Engineering"));
 		employeeList.add(new Employee(1001, "David", 35, 85000, "Marketing"));
-		employeeList.add(new Employee(1002, "Jena", 99, 95000.01, "HR"));
+		employeeList.add(new Employee(1002, "Jena", 99, 5000.01, "HR"));
 		employeeList.add(new Employee(1003, "Alice", 19, 85000, "HR"));
 
 		return employeeList;

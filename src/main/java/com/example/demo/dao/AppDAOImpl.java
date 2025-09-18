@@ -2,7 +2,6 @@ package com.example.demo.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
-import jakarta.persistence.TypedQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,7 +11,7 @@ public class AppDAOImpl implements AppDAO {
     private EntityManager entityManager;
 
     @Autowired // optional
-    public void AppDAOImpl(EntityManager theEntityManager) {
+    public AppDAOImpl(EntityManager theEntityManager) {
         entityManager = theEntityManager;
     }
 
@@ -25,6 +24,8 @@ public class AppDAOImpl implements AppDAO {
                 "(SELECT active FROM table2 LIMIT 1) AS colFromTable21," +
                 "(SELECT table2_col2 FROM table2 WHERE id = :id LIMIT 1) AS colFromTable22, " +
                 "(SELECT hobby FROM table3 WHERE id = :id LIMIT 1) AS colFromTable3";
+
+        System.out.println(sql);
 
         Query query = entityManager.createNativeQuery(sql);
         query.setParameter("id", id);
