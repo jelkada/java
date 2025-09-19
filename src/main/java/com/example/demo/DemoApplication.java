@@ -25,35 +25,31 @@ public class DemoApplication {
 	public CommandLineRunner commandLineRunner(AppDAO appDAO) {
 
 		return runner -> {
-			//new version
+
 			List<Employee> empList = employeeService.getAllEmployees();
 			System.out.println("\nemployeeService.getAllEmployees()");
 			printEmployees(empList);
 
-			// old version
-			// System.out.println(appDAO.getOneRow(2));
+			Employee[] empArray = empList.toArray(new Employee[0]);
+			System.out.println("\nThe employees array: ");
+			printEmployeesArray(empArray);
 
-			System.out.println("\nThe employees list:");
-			printEmployees(empList);
+			System.out.println("\ngetHighestPaidEmpByDept(empArray):");
+			getHighestPaidEmpByDept(empArray);
 
-			System.out.println("\ngetHighestPaidEmpByDept(empList):");
-			getHighestPaidEmpByDept(empList);
+			System.out.println("\nsortEmpBySalaryAge(empArray):");
+			printEmployeesArray(sortEmpBySalaryAge(empArray));
 
-			System.out.println("\nsortEmpBySalaryAge(empList):");
-			printEmployees(sortEmpBySalaryAge(empList));
+			System.out.println("\ngetDuplicateEmpNames(empArray):" + getDuplicateEmpNames(empArray));
 
-			System.out.println("\ngetDuplicateEmpNames(empList):");
-			getDuplicateEmpNames(empList);
+			System.out.println("\ngetEmployeesPerDept(empArray):" + getEmployeesPerDept(empArray));
 
-			System.out.println("\n\ngetEmployeesPerDept(empList):");
-			getEmployeesPerDept(empList);
-
-			System.out.println("\ngetHighestSalaryEmployee(empList): $" + String.format("%,.2f", getHighestSalaryEmployee(empList)));
+			System.out.println("\ngetHighestSalaryEmployee(empArray): $" + String.format("%,.2f", getHighestSalaryEmployee(empArray)));
 
 			System.out.println("\ncheckPalimdromeIds(empList):");
 			checkPalimdromeIds(empList);
 
-			System.out.println("\nshifyRightEmployees(empList, 3):");
+			System.out.println("\nshiftRightEmployees(empList, 3):");
 			printEmployees(shiftRightEmployees(empList, 3));
 
 			System.out.println("\nVehicle data:");
@@ -64,6 +60,12 @@ public class DemoApplication {
 			};
 			printCarsInfo(vehicles);
 		};
+	}
+
+	private void printEmployeesArray(Employee[] empArray) {
+		for (Employee emp: empArray) {
+			System.out.println(emp);
+		}
 	}
 
 	private void printCarsInfo(Vehicle[] vehicles) {
@@ -86,102 +88,63 @@ public class DemoApplication {
 
 	private void checkPalimdromeIds(List<Employee> empList) {
 		for (Employee emp: empList) {
-			System.out.println( +emp.getId() + " - " + isPalindrome(Integer.toString(emp.getId())));
+			String empId = Integer.toString(emp.getId());
+			System.out.println( +emp.getId() + " - " + empId.contentEquals(new StringBuilder(empId).reverse()) );
 		}
 	}
 
-	private boolean isPalindrome(String id) {
-		int len = id.length();
-		int mid = (int) Math.floor(len /2);
-
-		for (int i = 0; i < mid; i++) {
-			if (id.charAt(i) != id.charAt(len - 1 - i)) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private double getHighestSalaryEmployee(List<Employee> empList) {
+	private double getHighestSalaryEmployee(Employee[] empArray) {
 		double highestSalary = 0;
-		for (Employee emp: empList) {
+		for (Employee emp: empArray) {
 			highestSalary = Math.max(emp.getSalary(), highestSalary);
 		}
 
 		return highestSalary;
 	}
 
-	private void getEmployeesPerDept(List<Employee> empList) {
-		Map<String, List<Employee>> deptMap = new HashMap<>();
-		for (Employee emp : empList) {
+	private Map<String, Integer> getEmployeesPerDept(Employee[] empArray) {
+		Map<String, Integer> deptMap = new HashMap<>();
+		for (Employee emp : empArray) {
 			String dept = emp.getDepartment();
-			List<Employee> employees = deptMap.getOrDefault(dept, new ArrayList<>());
-			employees.add(emp);
-			deptMap.put(dept, employees);
+			deptMap.put(dept, deptMap.containsKey(dept) ? deptMap.get(dept) + 1 : 1);
 		}
 
-		System.out.println("Number of employees per department: ");
-		for (Map.Entry<String, List<Employee>> entry : deptMap.entrySet()) {
-			System.out.println(entry.getKey() + " - " + entry.getValue().size() + " employees.");
-		}
+		return deptMap;
 	}
 
-	private void getDuplicateEmpNames(List<Employee> empList) {
+	private Set<String> getDuplicateEmpNames(Employee[] empArray) {
 		Set<String> uniqueNames = new HashSet<>();
 		Set<String> duplicateNames = new HashSet<>();
 
-		System.out.print("Duplicate names: ");
-//		for (Employee emp: empList) {
-//			if (!uniqueNames.add(emp.getName())) {
-//				System.out.print(emp.getName() + " ");
-//			}
-//		}
-
-		for (Employee emp: empList) {
+		for (Employee emp: empArray) {
 			if (!uniqueNames.add(emp.getName())) {
 				duplicateNames.add(emp.getName());
 			}
 		}
-		for (String name: duplicateNames) {
-			System.out.print(" " +name);
-		}
 
-
-//		Map<String, Integer> namesMap = new HashMap<>();
-
-//		for (Employee emp: empList) {
-//			String name = emp.getName();
-//			namesMap.put(name, namesMap.containsKey(name) ? namesMap.get(name)+1 : 1);
-//		}
-//
-//		for (Map.Entry<String, Integer> entry : namesMap.entrySet()) {
-//			if (entry.getValue() > 1) {
-//				System.out.print(" " + entry.getKey());
-//			}
-//		}
+		return duplicateNames;
 	}
 
-	public void printEmployees(List<Employee> empList) {
+	private void printEmployees(List<Employee> empList) {
 		for (Employee emp: empList) {
 			System.out.println(emp);
 		}
 	}
 
-	public List<Employee> sortEmpBySalaryAge(List<Employee> empList) {
-		List<Employee> sortedEmpList = new ArrayList<>(empList);
-		sortedEmpList.sort((emp1, emp2) ->  {
+	private Employee[] sortEmpBySalaryAge(Employee[] empArray) {
+
+		Arrays.sort(empArray, (emp1, emp2) ->  {
 			int compareSalary = Double.compare(emp2.getSalary(), emp1.getSalary());
 			return compareSalary != 0 ? compareSalary : Double.compare(emp1.getAge(), emp2.getAge());
 		});
 
-		return sortedEmpList;
+		return empArray;
 	}
 
-	public void getHighestPaidEmpByDept(List<Employee> empList) {
+	private void getHighestPaidEmpByDept(Employee[] empArray) {
 		Map<String, Employee> highestPaidByDept = new HashMap<>();
 
-		for(Employee emp: empList) {
+		for(Employee emp: empArray) {
 			String dept = emp.getDepartment();
 			double salary = emp.getSalary();
 			if (!highestPaidByDept.containsKey(dept) || emp.getSalary() > highestPaidByDept.get(dept).getSalary()) {
@@ -194,17 +157,17 @@ public class DemoApplication {
 		}
 	}
 
-	public List<Employee> getEmployeeList() {
-		List<Employee> employeeList = new ArrayList<>();
-		employeeList.add(new Employee(100, "Charlie", 66, 9000.90, "Engineering"));
-		employeeList.add(new Employee(101, "Jim", 40, 990000, "Engineering"));
-		employeeList.add(new Employee(102, "Charlie", 78, 70000, "Marketing"));
-		employeeList.add(new Employee(103, "John111", 25, 99999.99, "Marketing"));
-		employeeList.add(new Employee(1000, "Jim", 55, 68500.20, "Engineering"));
-		employeeList.add(new Employee(1001, "David", 35, 85000, "Marketing"));
-		employeeList.add(new Employee(1002, "Jena", 99, 5000.01, "HR"));
-		employeeList.add(new Employee(1003, "Alice", 19, 85000, "HR"));
-
-		return employeeList;
-	}
+//	private List<Employee> getEmployeeList() {
+//		List<Employee> employeeList = new ArrayList<>();
+//		employeeList.add(new Employee(100, "Charlie", 66, 9000.90, "Engineering"));
+//		employeeList.add(new Employee(101, "Jim", 40, 990000, "Engineering"));
+//		employeeList.add(new Employee(102, "Charlie", 78, 70000, "Marketing"));
+//		employeeList.add(new Employee(103, "John111", 25, 99999.99, "Marketing"));
+//		employeeList.add(new Employee(1000, "Jim", 55, 68500.20, "Engineering"));
+//		employeeList.add(new Employee(1001, "David", 35, 85000, "Marketing"));
+//		employeeList.add(new Employee(1002, "Jena", 99, 5000.01, "HR"));
+//		employeeList.add(new Employee(1003, "Alice", 19, 85000, "HR"));
+//
+//		return employeeList;
+//	}
 }
