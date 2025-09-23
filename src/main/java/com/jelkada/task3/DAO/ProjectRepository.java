@@ -4,10 +4,7 @@ import com.jelkada.task3.entity.Employee;
 import com.jelkada.task3.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-<<<<<<< HEAD
-=======
 import org.springframework.data.repository.query.Param;
->>>>>>> 43e90ae (hibernate mappings and queries)
 
 import java.util.List;
 
