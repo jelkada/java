@@ -146,9 +146,10 @@ public class Task3Application {
 	}
 
 	public void findAllEmployeesByProjectId(AppDAO appDAO) {
-		List<Employee> employeeList = appDAO.findEmployeesByProjectId(1);
-
 		System.out.println("All employees in project (id=1)");
+		List<Employee> employeeList = appDAO.findEmployeesByProjectId(2);
+
+		System.out.println("All employees in project id: ");
 		employeeList.forEach(emp -> System.out.println(emp.getName()));
 	}
 

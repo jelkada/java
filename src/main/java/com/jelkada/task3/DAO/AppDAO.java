@@ -144,7 +144,7 @@ public class AppDAO implements IAppDAO {
   @Override
   public List<Employee> findEmployeesByProjectId(int projectId) {
 
-    return projectRepository.findProjectEmployeesByProjectId();
+    return projectRepository.findProjectEmployeesByProjectId(projectId);
 
     // this clearly will cause the error: failed to lazily initialize a collection
     // Project theProject = findProjectById(projectId);
