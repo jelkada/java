@@ -33,8 +33,7 @@ public class Task3Application {
 
 			addProjectsToDepartment(appDAO);
 
-			// Run only once, otherwise will cause an error
-			// assignProjectsToEmployee(appDAO);
+			assignProjectsToEmployee(appDAO);
 
 			addTasksToEmployeeWithProject(appDAO);
 
@@ -46,6 +45,8 @@ public class Task3Application {
 			findAllEmployeesByProjectId(appDAO);
 
 			deleteProjectById(appDAO);
+
+			deleteTaskById(appDAO);
 		};
 	}
 
@@ -93,25 +94,34 @@ public class Task3Application {
 		newProject1.setDepartment(theDepartment);
 		newProject2.setDepartment(theDepartment);
 
-		theDepartment.addProject(newProject1);
-		theDepartment.addProject(newProject2);
+		theDepartment.setProjects(List.of(newProject1, newProject2));
 
 		appDAO.saveDepartment(theDepartment);
 	}
 
 	private void assignProjectsToEmployee(AppDAO appDAO) {
-		appDAO.assignProjectsToEmployee(1, new int[]{1, 2});
+		// appDAO.assignProjectsToEmployee(1, new int[]{1, 2});
+		Employee tempEmployee = new Employee("NEW EMP 111", "jim" + getRandomNum() + "@gmail.com", 7000, 22);
+		// Address tempAddress = new Address("777 Hove Ave.", "Toronto", "ON", "M9P 1N3");
+
+		Project newProject1 = new Project("Project NEW1", 198000);
+		Project newProject2 = new Project("Project NEW2", 22890.99);
+
+		tempEmployee.setProjects(List.of(newProject1, newProject2));
+		appDAO.saveEmployee(tempEmployee);
 	}
 
 	private void addTasksToEmployeeWithProject(AppDAO appDAO) {
-		Employee theEmployee = appDAO.findEmployeeById(1);
+		Employee theEmployee = appDAO.findEmployeeById(2);
 		Project theProject = theEmployee.getProjects().getFirst();
 
 		Task task1 = new Task("this is task ABC", LocalDate.of(2026, 9, 30));
 		Task task2 = new Task("this is task DEF", LocalDate.of(2025, 11, 21));
+
 		task1.setProject(theProject);
-		task2.setProject(theProject);
 		task1.setEmployee(theEmployee);
+
+		task2.setProject(theProject);
 		task2.setEmployee(theEmployee);
 
 		theProject.addTask(task1);
@@ -153,9 +163,12 @@ public class Task3Application {
 		employeeList.forEach(emp -> System.out.println(emp.getName()));
 	}
 
-	// Does not work ... yet
 	private void deleteProjectById(AppDAO appDAO) {
 		appDAO.deleteProjectById(1);
+	}
+
+	private void deleteTaskById(AppDAO appDAO) {
+		appDAO.deleteTaskById(3);
 	}
 
 	// use to generate random email (email field UNIQUE in SQL Script)

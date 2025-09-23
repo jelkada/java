@@ -3,6 +3,7 @@ package com.jelkada.task3.DAO;
 import com.jelkada.task3.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PreRemove;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,16 +18,18 @@ public class AppDAO implements IAppDAO {
   private AddressRepository addressRepository;
   private DepartmentRepository departmentRepository;
   private ProjectRepository projectRepository;
+  private TaskRepository taskRepository;
   private EntityManager entityManager;
 
   public AppDAO(EntityManager theEntityManager, EmployeeRepository theEmployeeRepository,
                 AddressRepository theAddressRepository, DepartmentRepository theDepartmentRepository,
-                ProjectRepository theProjectRepository) {
+                ProjectRepository theProjectRepository, TaskRepository theTaskRepository) {
     entityManager = theEntityManager;
     employeeRepository = theEmployeeRepository;
     addressRepository = theAddressRepository;
     departmentRepository = theDepartmentRepository;
     projectRepository = theProjectRepository;
+    taskRepository = theTaskRepository;
   }
 
   @Override
@@ -152,7 +155,47 @@ public class AppDAO implements IAppDAO {
   }
 
   @Override
+  @Transactional
   public void deleteProjectById(int projectId) {
-    projectRepository.deleteById(projectId);
+    Project theProject = findProjectById(projectId);
+
+    // remove associations with employees() {
+    for (Employee emp : theProject.getEmployees()) {
+      emp.getProjects().remove(theProject);
+    }
+
+    // remove associations with tasks {
+    for (Task task : theProject.getTasks()) {
+      task.setProject(null);
+    }
+
+    // remove the association of the project with department
+    theProject.setDepartment(null);
+
+    // clear project side too
+    theProject.getEmployees().clear();
+
+    projectRepository.delete(theProject);
   }
+
+  @Override
+  @Transactional
+  public void deleteTaskById(int taskId) {
+    Optional<Task> tempTask = taskRepository.findById(taskId);
+
+    Task theTask = null;
+    if (tempTask.isPresent()) {
+      theTask = tempTask.get();
+    } else {
+      throw new RuntimeException("Task is not found: " + taskId);
+    }
+
+    theTask.getProject().getTasks().remove(theTask);
+
+    theTask.setEmployee(null);
+    theTask.setProject(null);
+
+    taskRepository.deleteById(taskId);
+  }
+
 }

@@ -27,4 +27,5 @@ public interface IAppDAO {
   List<Employee> findEmployeesByProjectId(int projectId);
 
   void deleteProjectById(int projectId);
+  void deleteTaskById(int taskId);
 }

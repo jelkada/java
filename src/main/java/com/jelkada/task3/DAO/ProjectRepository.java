@@ -15,6 +15,4 @@ public interface ProjectRepository extends JpaRepository<Project, Integer> {
       "JOIN employee_project ON employee.id = employee_project.employee_id " +
       "WHERE employee_project.project_id = :data;", nativeQuery = true)
   List<Employee> findProjectEmployeesByProjectId(@Param("data") int projectId);
-
-  void deleteById(int projectId);
 }

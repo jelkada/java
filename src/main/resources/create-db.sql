@@ -1,5 +1,4 @@
 DROP SCHEMA IF EXISTS `hb-task3`;
-
 CREATE SCHEMA `hb-task3`;
 
 use `hb-task3`;
@@ -11,20 +10,26 @@ CREATE TABLE address (
   street VARCHAR(128) DEFAULT NULL,
   city VARCHAR(45) DEFAULT NULL,
   state VARCHAR(45) DEFAULT NULL,
-  zip_code VARCHAR(12) DEFAULT NULL
+  zip_code VARCHAR(12) DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE department (
   id INT AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(45) DEFAULT NULL,
-  location VARCHAR(45) DEFAULT NULL
+  location VARCHAR(45) DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE project (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(45) DEFAULT NULL,
-  budget DECIMAL(10, 2) DEFAULT NULL,
+  budget DECIMAL(12, 2) DEFAULT NULL CHECK (budget >= 1000),
   department_id INT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
   CONSTRAINT fk_project_department FOREIGN KEY (department_id) REFERENCES department(id)
 	ON DELETE SET NULL
@@ -39,29 +44,40 @@ CREATE TABLE employee (
   age TINYINT DEFAULT NULL,
   address_id INT UNIQUE NULL,
   department_id INT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-CONSTRAINT fk_employee_department FOREIGN KEY (department_id) REFERENCES department(id)
-	ON DELETE SET NULL
-	ON UPDATE CASCADE
+  CONSTRAINT fk_employee_department FOREIGN KEY (department_id) REFERENCES department(id)
+    ON DELETE SET NULL
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE employee_project (
-    employee_id INT NOT NULL,
-    project_id INT NOT NULL,
-    PRIMARY KEY (employee_id, project_id),
-    FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE,
-    FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE
+  employee_id INT NOT NULL,
+  project_id INT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (employee_id, project_id),
+  FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE,
+  FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE,
+
+  -- CONSTRAINT max_3_projects_per_employee CHECK (
+    -- (SELECT COUNT(*) FROM employee_project ep WHERE ep.employee_id = employee_id) <= 3
+  -- )
 );
 
 CREATE TABLE task (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    description VARCHAR(255) NOT NULL,
-    deadline DATE,
-    employee_id INT NULL,
-    project_id INT NULL,
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  description VARCHAR(255) NOT NULL,
+  deadline DATE,
+  employee_id INT NULL,
+  project_id INT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
-    CONSTRAINT fk_task_employee FOREIGN KEY (employee_id) REFERENCES employee(id),
-    CONSTRAINT fk_task_project FOREIGN KEY (project_id) REFERENCES project(id)
+  CONSTRAINT fk_task_employee FOREIGN KEY (employee_id) REFERENCES employee(id),
+  CONSTRAINT fk_task_project FOREIGN KEY (project_id) REFERENCES project(id)
 );
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -113,7 +129,10 @@ INSERT INTO project (title, budget, department_id) VALUES
 
 INSERT INTO employee_project (employee_id, project_id) VALUES
 (1, 1),
+(1, 2),
+(1, 3),
 (2, 1),
+(2, 3),
 (3, 2),
 (4, 2),
 (5, 4),
@@ -123,3 +142,13 @@ INSERT INTO employee_project (employee_id, project_id) VALUES
 (9, 9),
 (10, 10);
 
+INSERT INTO task (description, deadline, employee_id, project_id)
+VALUES
+  ('Design homepage layout', '2025-10-01', 1, 1),
+  ('Fix login bug', '2025-09-25', 1, 2),
+  ('Write API documentation', '2025-10-05', 1, 3),
+  ('Implement payment gateway', '2025-10-10', 2, 1),
+  ('Conduct user testing', '2025-10-12', 2, 2),
+  ('Optimize database queries', '2025-09-30', 3, 1),
+  ('Create marketing materials', '2025-10-15', 3, 2),
+  ('Refactor legacy code', '2025-10-03', 3, 3);
