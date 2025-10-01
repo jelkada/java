@@ -1,33 +1,48 @@
 package com.jelkada.task3.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name="employee")
+@Data
+@NoArgsConstructor
+@RequiredArgsConstructor
+// @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Employee {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name="id")
+  // @EqualsAndHashCode.Include
   private int id;
 
   @Column(name="name")
+  @NonNull
+  @EqualsAndHashCode.Include
   private String name;
 
-  @Column(name="email")
+  @Column(name="email", unique = true)
+//  @EqualsAndHashCode.Include
+  @NonNull
   private String email;
 
   @Column(name="salary")
-  private double salary;
+  @NonNull
+  private Double salary;
 
   @Column(name="age")
-  private int age;
+  @NonNull
+  private Integer age;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name="address_id")
+  @NonNull
   private Address address;
 
   @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH})
@@ -43,97 +58,22 @@ public class Employee {
       joinColumns = @JoinColumn(name="employee_id"),
       inverseJoinColumns = @JoinColumn(name="project_id")
   )
+  @JsonIgnore
   private List<Project> projects;
-
-
-  public Employee() {
-  }
-
-  public Employee(String name, String email, double salary, int age) {
-    this.name = name;
-    this.email = email;
-    this.salary = salary;
-    this.age = age;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
-  }
-
-  public double getSalary() {
-    return salary;
-  }
-
-  public void setSalary(double salary) {
-    this.salary = salary;
-  }
-
-  public int getAge() {
-    return age;
-  }
-
-  public void setAge(int age) {
-    this.age = age;
-  }
-
-  public Address getAddress() {
-    return address;
-  }
-
-  public void setAddress(Address address) {
-    this.address = address;
-  }
-
-  public Department getDepartment() {
-    return department;
-  }
-
-  public void setDepartment(Department department) {
-    this.department = department;
-  }
-
-  public List<Project> getProjects() {
-    return projects;
-  }
-
-  public void setProjects(List<Project> projects) {
-    this.projects = projects;
-  }
-
-  @Override
-  public String toString() {
-    return "Employee{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", email='" + email + '\'' +
-        ", salary=" + salary +
-        ", age=" + age +
-        ", address=" + address +
-        '}';
-  }
 
   public  void addProject(Project theProject) {
     if (projects == null) {
       projects = new ArrayList<>();
+    } else if (projects.size() >= 3) {
+      throw new IllegalStateException("An employee cannot work on more than 3 projects.");
     }
 
     projects.add(theProject);
   }
 
+  public void removeProject(Project theProject) {
+    projects.remove(theProject);
+
+    theProject.getEmployees().remove(this);
+  }
 }

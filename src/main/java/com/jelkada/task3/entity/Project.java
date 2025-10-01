@@ -1,12 +1,19 @@
 package com.jelkada.task3.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name="project")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Project {
 
   @Id
@@ -22,82 +29,23 @@ public class Project {
 
   @ManyToOne
   @JoinColumn(name = "department_id") // FK column
+  @JsonIgnore
   private Department department;
 
   @ManyToMany(
       mappedBy = "projects",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}
   )
+  @JsonIgnore
   private List<Employee> employees;
 
   @OneToMany(
       mappedBy = "project",
       fetch = FetchType.EAGER,
-      cascade = CascadeType.ALL
+      cascade = CascadeType.ALL,
+      orphanRemoval = true
   )
   private List<Task> tasks;
-
-
-  public Project() {
-  }
-
-  public Project(String title, double budget) {
-    this.title = title;
-    this.budget = budget;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public String getTitle() {
-    return title;
-  }
-
-  public void setTitle(String title) {
-    this.title = title;
-  }
-
-  public double getBudget() {
-    return budget;
-  }
-
-  public void setBudget(double budget) {
-    this.budget = budget;
-  }
-
-  public Department getDepartment() {
-    return department;
-  }
-
-  public void setDepartment(Department department) {
-    this.department = department;
-  }
-
-  public List<Employee> getEmployees() {
-    return employees;
-  }
-
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
-  }
-
-  public List<Task> getTasks() {
-    return tasks;
-  }
-
-  public void setTasks(List<Task> tasks) {
-    this.tasks = tasks;
-  }
-
-  @Override
-  public String toString() {
-    return "Project{" +
-        "id=" + id +
-        ", title='" + title + '\'' +
-        ", budget=" + budget +
-        '}';
-  }
 
   public  void addEmployee(Employee theEmployee) {
     if (employees == null) {
@@ -114,4 +62,5 @@ public class Project {
 
     tasks.add(theTask);
   }
+
 }

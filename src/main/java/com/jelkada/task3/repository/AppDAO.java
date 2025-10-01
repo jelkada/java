@@ -1,9 +1,8 @@
-package com.jelkada.task3.DAO;
+package com.jelkada.task3.repository;
 
 import com.jelkada.task3.entity.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PreRemove;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

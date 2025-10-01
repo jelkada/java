@@ -1,11 +1,18 @@
 package com.jelkada.task3.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name="task")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
 
   @Id
@@ -21,62 +28,11 @@ public class Task {
 
   @ManyToOne
   @JoinColumn(name="employee_id")
+  @JsonIgnore
   private Employee employee;
 
   @ManyToOne
   @JoinColumn(name="project_id")
+  @JsonIgnore
   private Project project;
-
-  public Task() {
-  }
-
-  public Task(String description, LocalDate deadline) {
-    this.description = description;
-    this.deadline = deadline;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public String getDescription() {
-    return description;
-  }
-
-  public void setDescription(String description) {
-    this.description = description;
-  }
-
-  public LocalDate getDeadline() {
-    return deadline;
-  }
-
-  public void setDeadline(LocalDate deadline) {
-    this.deadline = deadline;
-  }
-
-  public Employee getEmployee() {
-    return employee;
-  }
-
-  public void setEmployee(Employee employee) {
-    this.employee = employee;
-  }
-
-  public Project getProject() {
-    return project;
-  }
-
-  public void setProject(Project project) {
-    this.project = project;
-  }
-
-  @Override
-  public String toString() {
-    return "Task{" +
-        "id=" + id +
-        ", description='" + description + '\'' +
-        ", deadline=" + deadline +
-        '}';
-  }
 }

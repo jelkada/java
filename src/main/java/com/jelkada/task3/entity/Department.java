@@ -1,12 +1,19 @@
 package com.jelkada.task3.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name="department")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Department {
 
   @Id
@@ -24,62 +31,20 @@ public class Department {
       mappedBy="department",
       cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.DETACH, CascadeType.REFRESH}
   )
+  @JsonIgnore
   private List<Employee> employees;
 
-//  This is the setup if we had Unidirectional relationship
-//  In a bidirectional relationship - The owning side is the one responsible for managing the foreign key (department_id)
+//  In a bidirectional relationship the owning side is the one responsible for managing the foreign key (department_id)
 //  And The @JoinColumn must be on the owning side — otherwise, Hibernate won't know where to insert/update the FK.
+  // This would be the setup for unidirectional - if Project did not have @ManyToOne
 //  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //  @JoinColumn(name = "department_id") // FK in Project table
   @OneToMany(
       mappedBy="department",
       fetch = FetchType.EAGER,
       cascade = CascadeType.ALL)
+  @JsonIgnore
   private List<Project> projects;
-
-  public Department() {
-  }
-
-  public Department(String name, String location) {
-    this.name = name;
-    this.location = location;
-  }
-
-  public int getId() {
-    return id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getLocation() {
-    return location;
-  }
-
-  public void setLocation(String location) {
-    this.location = location;
-  }
-
-  public List<Employee> getEmployees() {
-    return employees;
-  }
-
-  public void setEmployees(List<Employee> employees) {
-    this.employees = employees;
-  }
-
-  public List<Project> getProjects() {
-    return projects;
-  }
-
-  public void setProjects(List<Project> projects) {
-    this.projects = projects;
-  }
 
   public  void addProject(Project theProject) {
     if (projects == null) {
@@ -88,14 +53,4 @@ public class Department {
 
     projects.add(theProject);
   }
-
-  @Override
-  public String toString() {
-    return "Department{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", location='" + location + '\'' +
-        '}';
-  }
-
 }

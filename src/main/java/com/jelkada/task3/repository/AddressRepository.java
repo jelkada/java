@@ -1,4 +1,4 @@
-package com.jelkada.task3.DAO;
+package com.jelkada.task3.repository;
 
 import com.jelkada.task3.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;

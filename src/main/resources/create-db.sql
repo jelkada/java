@@ -1,9 +1,9 @@
-DROP SCHEMA IF EXISTS `hb-task3`;
-CREATE SCHEMA `hb-task3`;
+DROP SCHEMA IF EXISTS hb_employees_app;
+CREATE SCHEMA hb_employees_app;
 
-use `hb-task3`;
+use hb_employees_app;
 
-SET FOREIGN_KEY_CHECKS = 0;
+-- SET FOREIGN_KEY_CHECKS = 0;
 
 CREATE TABLE address (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -30,6 +30,8 @@ CREATE TABLE project (
   department_id INT NULL,
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  CONSTRAINT chk_project_budget CHECK (budget >= 10000),
 
   CONSTRAINT fk_project_department FOREIGN KEY (department_id) REFERENCES department(id)
 	ON DELETE SET NULL
@@ -60,7 +62,7 @@ CREATE TABLE employee_project (
 
   PRIMARY KEY (employee_id, project_id),
   FOREIGN KEY (employee_id) REFERENCES employee(id) ON DELETE CASCADE,
-  FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE,
+  FOREIGN KEY (project_id) REFERENCES project(id) ON DELETE CASCADE
 
   -- CONSTRAINT max_3_projects_per_employee CHECK (
     -- (SELECT COUNT(*) FROM employee_project ep WHERE ep.employee_id = employee_id) <= 3
@@ -80,7 +82,7 @@ CREATE TABLE task (
   CONSTRAINT fk_task_project FOREIGN KEY (project_id) REFERENCES project(id)
 );
 
-SET FOREIGN_KEY_CHECKS = 1;
+-- SET FOREIGN_KEY_CHECKS = 1;
 
 -- Insert Departments
 INSERT INTO department (name, location) VALUES
@@ -117,7 +119,7 @@ INSERT INTO employee (name, email, salary, age, address_id, department_id) VALUE
 -- Insert Projects assigned to departments
 INSERT INTO project (title, budget, department_id) VALUES
 ('Project Apollo', 150000.00, 1),
-('Project Zeus', 200000.00, 1),
+('Project AI', 200000.00, 1),
 ('Project Hera', 180000.00, 1),
 ('Project Hermes', 120000.00, 2),
 ('Project Athena', 140000.00, 2),
@@ -140,6 +142,9 @@ INSERT INTO employee_project (employee_id, project_id) VALUES
 (7, 7),
 (8, 6),
 (9, 9),
+(10, 1),
+(10, 8),
+(10, 9),
 (10, 10);
 
 INSERT INTO task (description, deadline, employee_id, project_id)

@@ -1,6 +1,5 @@
-package com.jelkada.task3.DAO;
+package com.jelkada.task3.repository;
 
-import com.jelkada.task3.entity.Address;
 import com.jelkada.task3.entity.Department;
 import com.jelkada.task3.entity.Employee;
 import com.jelkada.task3.entity.Project;
